@@ -13,9 +13,9 @@ export async function POST(req: NextRequest) {
     const { name, email, product, units, message } = body;
 
     // Basic validation
-    if (!name || !email) {
+    if (!name || !email || !product || !units) {
       return NextResponse.json(
-        { error: 'Name and email are required.' },
+        { error: 'Name, email, product, and quantity are required.' },
         { status: 400 }
       );
     }

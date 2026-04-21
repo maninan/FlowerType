@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { ContactFormData } from '@/types';
 
 const productOptions = [
@@ -16,7 +17,8 @@ const productOptions = [
   'Custom / Bespoke Build',
 ];
 
-export default function ContactSection() {
+function ContactForm() {
+  const searchParams = useSearchParams();
   const [form, setForm] = useState<ContactFormData>({
     name: '',
     email: '',
@@ -24,6 +26,21 @@ export default function ContactSection() {
     units: '',
     message: '',
   });
+
+  useEffect(() => {
+    const productParam = searchParams.get('product');
+    if (productParam) {
+      // Find matching option or set exact value
+      const matched = productOptions.find(opt => 
+        opt.toLowerCase().includes(productParam.toLowerCase())
+      );
+      if (matched) {
+        setForm(prev => ({ ...prev, product: matched }));
+      } else {
+        setForm(prev => ({ ...prev, product: productParam }));
+      }
+    }
+  }, [searchParams]);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -141,13 +158,14 @@ export default function ContactSection() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="form-control">
                     <label className="label pb-1">
-                      <span className="label-text text-sm font-medium text-slate-600">Product Interest</span>
+                      <span className="label-text text-sm font-medium text-slate-600">Product Interest *</span>
                     </label>
                     <select
                       id="contact-product"
                       name="product"
                       value={form.product}
                       onChange={handleChange}
+                      required
                       className="select select-bordered w-full rounded-xl border-slate-200 focus:border-emerald-500 focus:outline-none"
                     >
                       <option value="">Select a model...</option>
@@ -158,7 +176,7 @@ export default function ContactSection() {
                   </div>
                   <div className="form-control">
                     <label className="label pb-1">
-                      <span className="label-text text-sm font-medium text-slate-600">Number of Units</span>
+                      <span className="label-text text-sm font-medium text-slate-600">Number of Units *</span>
                     </label>
                     <input
                       id="contact-units"
@@ -167,6 +185,7 @@ export default function ContactSection() {
                       placeholder="e.g. 5–10"
                       value={form.units}
                       onChange={handleChange}
+                      required
                       className="input input-bordered w-full rounded-xl border-slate-200 focus:border-emerald-500 focus:outline-none"
                     />
                   </div>
@@ -214,5 +233,13 @@ export default function ContactSection() {
         </div>
       </div>
     </section>
+  );
+}
+
+export default function ContactSection() {
+  return (
+    <Suspense fallback={<div className="min-h-[400px] flex items-center justify-center text-white/50">Loading form...</div>}>
+      <ContactForm />
+    </Suspense>
   );
 }

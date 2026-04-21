@@ -108,7 +108,7 @@ export default async function ProductDetailPage({ params }: Props) {
               </div>
 
               <Link
-                href="/#contact"
+                href={`/#contact?product=${encodeURIComponent(product.model)}`}
                 className="btn w-full bg-emerald-600 hover:bg-emerald-500 text-white border-0 rounded-xl py-3 font-semibold text-base transition-all hover:scale-[1.02]"
               >
                 Get a Quote for This Model →

@@ -37,6 +37,9 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 0;
   transform: translateY(30px);
   transition: opacity 0.65s ease, transform 0.65s ease;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform-style: flat;
 }
 .reveal.active {
   opacity: 1;

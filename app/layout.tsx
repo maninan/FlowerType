@@ -29,7 +29,7 @@ export default function RootLayout({
     <html lang="en" data-theme="light">
       <body>
         <Navbar />
-        <main>{children}</main>
+        <main className="relative z-0" style={{ isolation: 'isolate' }}>{children}</main>
         <Footer />
         <WhatsAppButton />
         <ScrollReveal />
