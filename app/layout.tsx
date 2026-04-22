@@ -1,9 +1,25 @@
 import type { Metadata } from 'next';
+import { Barlow, Barlow_Condensed } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppButton from '@/components/ui/WhatsAppButton';
 import ScrollReveal from '@/components/ui/ScrollReveal';
+
+const barlow = Barlow({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  style: ['normal', 'italic'],
+  variable: '--font-barlow',
+  display: 'swap',
+});
+
+const barlowCondensed = Barlow_Condensed({
+  subsets: ['latin'],
+  weight: ['400', '600', '700', '800'],
+  variable: '--font-barlow-condensed',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Flower Capsule — Premium Smart Living',
@@ -26,7 +42,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-theme="light">
+    <html lang="en" data-theme="light" className={`${barlow.variable} ${barlowCondensed.variable}`}>
       <body>
         <Navbar />
         <main className="relative z-0" style={{ isolation: 'isolate' }}>{children}</main>

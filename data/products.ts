@@ -20,7 +20,7 @@ export const products: Product[] = [
     guests: '3–4 people',
     weight: '9,000 kg',
     // ↓ CHANGE THIS to your own image path, e.g. '/images/products/e3-orbit.jpg'
-    image: '/Volumes/KINGSTON/Website/FlowerType/flowertype-next/public/images/home.jpg',
+    image: '/images/home.jpg',
     images: [
       'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=900&q=80',
     ],

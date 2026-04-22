@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 /**
  * ScrollReveal — Observes all `.reveal` elements and adds `.active`
@@ -8,6 +9,8 @@ import { useEffect } from 'react';
  * safely use browser APIs.
  */
 export default function ScrollReveal() {
+  const pathname = usePathname();
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries, obs) => {
@@ -21,20 +24,18 @@ export default function ScrollReveal() {
       { rootMargin: '0px 0px -40px 0px', threshold: 0.05 }
     );
 
-    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-
-    // Fallback for elements already in viewport
-    setTimeout(() => {
-      document.querySelectorAll('.reveal:not(.active)').forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight && rect.bottom > 0) {
-          el.classList.add('active');
-        }
-      });
-    }, 200);
+    const elements = document.querySelectorAll<Element>('.reveal:not(.active)');
+    elements.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        el.classList.add('active');
+      } else {
+        observer.observe(el);
+      }
+    });
 
     return () => observer.disconnect();
-  }, []);
+  }, [pathname]);
 
   return null;
 }

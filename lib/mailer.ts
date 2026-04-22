@@ -24,14 +24,26 @@ export interface EnquiryEmailPayload {
   message: string;
 }
 
+function esc(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 export async function sendEnquiryEmail(data: EnquiryEmailPayload): Promise<void> {
-  const { name, email, product, units, message } = data;
+  const name = esc(data.name);
+  const email = esc(data.email);
+  const product = esc(data.product);
+  const units = esc(data.units);
+  const message = esc(data.message ?? '');
 
   // Email to business owner
   await transporter.sendMail({
     from: `"FlowerType Enquiry" <${process.env.SMTP_FROM}>`,
     to: process.env.SMTP_TO,
-    replyTo: email,
+    replyTo: data.email,
     subject: `New Enquiry from ${name} — ${product || 'General'}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -59,7 +71,7 @@ export async function sendEnquiryEmail(data: EnquiryEmailPayload): Promise<void>
   // Auto-reply to customer
   await transporter.sendMail({
     from: `"Flower Smart Technology" <${process.env.SMTP_FROM}>`,
-    to: email,
+    to: data.email,
     subject: 'We received your enquiry — Flower Smart Technology',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

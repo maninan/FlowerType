@@ -24,12 +24,12 @@ export default function CatalogDownload() {
 
           <div className="flex-shrink-0">
             <a
-              href="/downloads/catalog.pptx"
+              href="/downloads/Catalog.pdf"
               download
               className="btn bg-emerald-500 hover:bg-emerald-400 text-emerald-950 border-0 rounded-2xl px-10 py-4 h-auto text-lg font-bold flex flex-col items-center gap-1 shadow-2xl shadow-emerald-500/20 transition-all hover:scale-105"
             >
               <span>Download Catalog</span>
-              <span className="text-xs opacity-70 font-medium">PPTX &middot; 24.5 MB</span>
+              <span className="text-xs opacity-70 font-medium">PDF</span>
             </a>
             <p className="text-center text-slate-400 text-[10px] mt-4 uppercase tracking-widest font-semibold">
               Updated: April 2024

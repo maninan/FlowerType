@@ -3,17 +3,10 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ContactFormData } from '@/types';
+import { products } from '@/data/products';
 
 const productOptions = [
-  'E3 — Orbit Cabin (50㎡, 2F)',
-  'E5 — Nova Pod (28㎡)',
-  'E7 — Stellar Lodge (38㎡)',
-  'F5 — Dune Pod (28㎡)',
-  'F7 — Ridge Cabin (38㎡)',
-  'Zenith Twin — Double Layer',
-  'N7 — Forest Cabin (Apple)',
-  'H7 — Meadow Pod (Apple)',
-  'H3 — Steam Pod (Sauna)',
+  ...products.map((p) => `${p.model} — ${p.name.split(' — ')[0]}`),
   'Custom / Bespoke Build',
 ];
 
@@ -26,31 +19,27 @@ function ContactForm() {
     units: '',
     message: '',
   });
-
-  useEffect(() => {
-    const productParam = searchParams.get('product');
-    if (productParam) {
-      // Find matching option or set exact value
-      const matched = productOptions.find(opt => 
-        opt.toLowerCase().includes(productParam.toLowerCase())
-      );
-      if (matched) {
-        setForm(prev => ({ ...prev, product: matched }));
-      } else {
-        setForm(prev => ({ ...prev, product: productParam }));
-      }
-    }
-  }, [searchParams]);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
+
+  useEffect(() => {
+    const modelParam = searchParams.get('model') || searchParams.get('product');
+    if (modelParam) {
+      const matched = productOptions.find((opt) =>
+        opt.toLowerCase().includes(modelParam.toLowerCase())
+      );
+      setForm((prev) => ({ ...prev, product: matched ?? modelParam }));
+    }
+  }, [searchParams]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus('loading');
     setErrorMsg('');
@@ -98,7 +87,10 @@ function ContactForm() {
                 { icon: '📍', label: 'Address', val: 'Changzhou, Jiangsu, China' },
               ].map((c) => (
                 <div key={c.label} className="flex gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-lg flex-shrink-0">
+                  <div
+                    aria-hidden="true"
+                    className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-lg flex-shrink-0"
+                  >
                     {c.icon}
                   </div>
                   <div>
@@ -117,14 +109,23 @@ function ContactForm() {
             </h3>
 
             {status === 'success' ? (
-              <div className="alert alert-success rounded-2xl">
-                <span>✅ Enquiry sent! We&apos;ll reply within 24 hours.</span>
+              <div className="space-y-4">
+                <div className="alert alert-success rounded-2xl">
+                  <span>Enquiry sent! We&apos;ll reply within 24 hours.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setStatus('idle')}
+                  className="btn w-full btn-outline border-slate-200 text-slate-600 rounded-xl"
+                >
+                  Send Another Enquiry
+                </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="form-control">
-                    <label className="label pb-1">
+                    <label htmlFor="contact-name" className="label pb-1">
                       <span className="label-text text-sm font-medium text-slate-600">Your Name *</span>
                     </label>
                     <input
@@ -139,7 +140,7 @@ function ContactForm() {
                     />
                   </div>
                   <div className="form-control">
-                    <label className="label pb-1">
+                    <label htmlFor="contact-email" className="label pb-1">
                       <span className="label-text text-sm font-medium text-slate-600">Email Address *</span>
                     </label>
                     <input
@@ -157,7 +158,7 @@ function ContactForm() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="form-control">
-                    <label className="label pb-1">
+                    <label htmlFor="contact-product" className="label pb-1">
                       <span className="label-text text-sm font-medium text-slate-600">Product Interest *</span>
                     </label>
                     <select
@@ -175,7 +176,7 @@ function ContactForm() {
                     </select>
                   </div>
                   <div className="form-control">
-                    <label className="label pb-1">
+                    <label htmlFor="contact-units" className="label pb-1">
                       <span className="label-text text-sm font-medium text-slate-600">Number of Units *</span>
                     </label>
                     <input
@@ -192,7 +193,7 @@ function ContactForm() {
                 </div>
 
                 <div className="form-control">
-                  <label className="label pb-1">
+                  <label htmlFor="contact-message" className="label pb-1">
                     <span className="label-text text-sm font-medium text-slate-600">Tell us about your project</span>
                   </label>
                   <textarea
@@ -215,8 +216,8 @@ function ContactForm() {
                 <button
                   id="contact-submit"
                   type="submit"
-                  disabled={status === 'loading'}
-                  className="btn w-full bg-[#0d1b2a] hover:bg-emerald-700 text-white border-0 rounded-xl py-3 font-semibold text-base transition-all hover:scale-[1.02] disabled:opacity-60"
+                  disabled={status === 'loading' || !form.name || !form.email || !form.product || !form.units}
+                  className="btn w-full bg-[#0d1b2a] hover:bg-emerald-700 text-white border-0 rounded-xl py-3 font-semibold text-base transition-all hover:scale-[1.02] disabled:opacity-50 disabled:grayscale-[0.5] disabled:cursor-not-allowed"
                 >
                   {status === 'loading' ? (
                     <span className="loading loading-spinner loading-sm" />
